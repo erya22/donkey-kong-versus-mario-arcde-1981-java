@@ -19,7 +19,6 @@ public class Entity {
 	
 	private int spriteCounter;
 	private int spriteNum;
-	private HashMap<String, BufferedImage[]> spriteMap;
 	
 	private Universe universe;
 	
@@ -86,14 +85,6 @@ public class Entity {
 
 	public void setSpriteNum(int spriteNum) {
 		this.spriteNum = spriteNum;
-	}
-
-	public HashMap<String, BufferedImage[]> getSpriteMap() {
-		return spriteMap;
-	}
-
-	public void setSpriteMap(HashMap<String, BufferedImage[]> spriteMap) {
-		this.spriteMap = spriteMap;
 	}
 
 	public Universe getUniverse() {

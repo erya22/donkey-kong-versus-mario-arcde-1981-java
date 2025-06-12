@@ -9,11 +9,15 @@ import java.awt.GridBagLayout;
 import javax.swing.JPanel;
 
 import donkeykongvsmario.model.Map;
+import donkeykongvsmario.model.Player;
+import donkeykongvsmario.model.Universe;
 
 public class UniversePanel extends JPanel {
 
 	private Map map;
 	private MapRenderer mapPanel;
+	
+	private PlayerView playerView;
 	
 	/**
 	 * Si occupa di gestire le view di tutte le entità di gioco.
@@ -30,7 +34,15 @@ public class UniversePanel extends JPanel {
 		 gbc.gridy = 0;
 		 gbc.anchor = GridBagConstraints.CENTER; // centro orizzontale e verticale
 		 add(mapPanel, gbc);
+		 
+		 Universe universe = new Universe();
+		 this.playerView = new PlayerView(universe.getPlayer());
 	}
+	
+	public void addComponents() {
+	    this.add(playerView);
+	}
+
 	
 	@Override
 	protected void paintComponent(Graphics g) {

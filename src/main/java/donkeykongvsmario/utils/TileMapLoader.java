@@ -48,21 +48,20 @@ public class TileMapLoader {
 
         boolean[][] collisionMap = new boolean[height][width];
 
-        for (Layer layer : map.getTileMap().getLayers()) {
-            if (!layer.getName().equalsIgnoreCase("Collision")) continue;
-
-            int[] flatData = layer.getData(); 
-
-            for (int y = 0; y < height; y++) {
-                for (int x = 0; x < width; x++) {
-                    int index = y * width + x;
-                    if (index < flatData.length && flatData[index] != 0) {
-                        collisionMap[y][x] = true;
-                    }
-                }
-            }
-            break; 
+        //TODO: COLLISION NON E' UN ARRAY
+        int[] flatData = map.getTileMap().getLayers().get(2).getData();
+        
+        for (int y = 0; y < height; y++) {
+        	for (int x = 0; x < width; x++) {
+        		int index = y * width + x;
+        		if (index < flatData.length && flatData[index] != 0) {
+        			collisionMap[y][x] = true;
+        			log.info("{}",collisionMap[y][x]);
+        		}
+        	}
         }
+      
+
 
         return collisionMap;
     }

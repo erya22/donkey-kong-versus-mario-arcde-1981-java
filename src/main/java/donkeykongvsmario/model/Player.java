@@ -2,18 +2,26 @@ package donkeykongvsmario.model;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import donkeykongvsmario.obspattern.Observable;
+import donkeykongvsmario.obspattern.Observer;
+
 public class Player extends Entity {
 	private static final Logger log = LoggerFactory.getLogger(Player.class);
 	
+	private List<Observer> observers = new ArrayList<>();
+
 	private MovementState movement;
 	private State state;
+	private Animation animation;
 	
 	private int jumpStrenght = 15;
 	
@@ -26,10 +34,25 @@ public class Player extends Entity {
 	
 	private  int highscore;
 	
+	private HashMap<Animation, BufferedImage[]> spriteMap;
+	
 	public Player(Universe universe, String name) {
 		super(universe, name);
+
+		this.spriteMap = new HashMap<Animation, BufferedImage[]>();
 		getPlayerImage();
 		setDefaultValues();
+	}
+	
+	private void notifyObservers() {
+        for (Observer observer : observers) {
+//            observer.update(this);  // Supponendo che Observer abbia un metodo update(Player player)
+        }
+    }
+
+	
+	public void addObserver(Observer observer) {
+	    observers.add(observer);
 	}
 	
 	public void setDefaultValues()  {
@@ -42,12 +65,21 @@ public class Player extends Entity {
 		
 		this.setDirection(Direction.RIGHT);
 		this.setTerrain(Terrain.BEAM);
-		
 		this.setState(State.ALIVE);
+		this.setAnimation(Animation.IDLE);
+		this.setMovement(MovementState.IDLE);
+		
 	}
 	
+	public HashMap<Animation, BufferedImage[]> getSpriteMap() {
+		return spriteMap;
+	}
+
+	public void setSpriteMap(HashMap<Animation, BufferedImage[]> spriteMap) {
+		this.spriteMap = spriteMap;
+	}
+
 	public void getPlayerImage() {
-		HashMap<String, BufferedImage[]> spriteMap = this.getSpriteMap();
         try {
         	
             // UP/DOWN
@@ -55,30 +87,30 @@ public class Player extends Entity {
             for (int i = 0; i < 7; i++) {
                 up[i] = ImageIO.read(getClass().getResourceAsStream("/PLAYER/b" + (i+1) + ".png"));
             }
-            spriteMap.put("up", up);
-            spriteMap.put("down", up);
+            spriteMap.put(Animation.CLIMBU, up);
+            spriteMap.put(Animation.CLIMBD, up);
 
             // RIGHT
             BufferedImage[] right = new BufferedImage[4];
             for (int i = 0; i < 4; i++) {
                 right[i] = ImageIO.read(getClass().getResourceAsStream("/PLAYER/a" + (i + 1) + ".png"));
             }
-            spriteMap.put("right", right);
+            spriteMap.put(Animation.WALKR, right);
 
             // LEFT
             BufferedImage[] left = new BufferedImage[4];
             for (int i = 0; i < 4; i++) {
                 left[i] = ImageIO.read(getClass().getResourceAsStream("/PLAYER/m" + (i + 1) + ".png"));
             }
-            spriteMap.put("left", left);
+            spriteMap.put(Animation.WALKL, left);
             
             // JUMP ANIMATION
             BufferedImage[] jumpR = new BufferedImage[1];
             jumpR[0] = ImageIO.read(getClass().getResourceAsStream("/PLAYER/c3.png"));
-            spriteMap.put("jumpR", jumpR);
+            spriteMap.put(Animation.JUMPR, jumpR);
             BufferedImage[] jumpL = new BufferedImage[1];
             jumpL[0] = ImageIO.read(getClass().getResourceAsStream("/PLAYER/m3.png"));
-            spriteMap.put("jumpL", jumpL);
+            spriteMap.put(Animation.JUMPL, jumpL);
 
             BufferedImage[] hitFrames = new BufferedImage[5];
             // DEATH ANIMATION
@@ -86,12 +118,20 @@ public class Player extends Entity {
                 hitFrames[i] = ImageIO.read(getClass().getResourceAsStream("/PLAYER/e" + (i + 1) + ".png"));
             }
             
-            spriteMap.put("hit", hitFrames);
+            spriteMap.put(Animation.HITR, hitFrames);
 
 
         } catch (IOException e) {
             e.printStackTrace();
         }
+	}
+
+	public Animation getAnimation() {
+		return animation;
+	}
+
+	public void setAnimation(Animation animation) {
+		this.animation = animation;
 	}
 
 	public MovementState getMovement() {

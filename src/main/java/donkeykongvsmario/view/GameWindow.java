@@ -4,9 +4,9 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 
 import javax.swing.JFrame;
-import javax.swing.OverlayLayout;
 
 import donkeykongvsmario.controller.GameInputHandler;
+import donkeykongvsmario.model.Universe;
 
 public class GameWindow extends JFrame {
 	

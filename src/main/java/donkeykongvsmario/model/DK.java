@@ -10,6 +10,7 @@ public class DK extends Entity {
 
 	//STATO DK
 	private State state;
+	private HashMap<String, BufferedImage[]> spriteMap;
 	
 	
 	//ACTION
@@ -60,6 +61,16 @@ public class DK extends Entity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+	}
+	
+	
+
+	public HashMap<String, BufferedImage[]> getSpriteMap() {
+		return spriteMap;
+	}
+
+	public void setSpriteMap(HashMap<String, BufferedImage[]> spriteMap) {
+		this.spriteMap = spriteMap;
 	}
 
 	public State getState() {

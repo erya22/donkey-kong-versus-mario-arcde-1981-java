@@ -7,6 +7,8 @@ import java.util.HashMap;
 import javax.imageio.ImageIO;
 
 public class Pauline extends Entity{
+	
+	private HashMap<String, BufferedImage[]> spriteMap;
 	 
 	 public Pauline(Universe universe) {
 		super(universe, "Pauline");
@@ -33,6 +35,14 @@ public class Pauline extends Entity{
 	            e.printStackTrace();
 	        }
 	 }
+
+	public HashMap<String, BufferedImage[]> getSpriteMap() {
+		return spriteMap;
+	}
+
+	public void setSpriteMap(HashMap<String, BufferedImage[]> spriteMap) {
+		this.spriteMap = spriteMap;
+	}
 
 	
 
