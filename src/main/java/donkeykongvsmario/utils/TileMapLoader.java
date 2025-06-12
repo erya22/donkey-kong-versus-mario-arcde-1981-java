@@ -9,14 +9,20 @@ import java.io.Reader;
 
 import javax.imageio.ImageIO;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.gson.Gson;
 
+import donkeykongvsmario.model.Layer;
+import donkeykongvsmario.model.Map;
 import donkeykongvsmario.model.TileMap;
 
 public class TileMapLoader {
+	private static final Logger log = LoggerFactory.getLogger(TileMapLoader.class);
 
     public static TileMap loadMap() {
-        try (InputStream jsonStream = TileMapLoader.class.getResourceAsStream("/MAPPA32/JSON/mappa25m.json")) {
+        try (InputStream jsonStream = TileMapLoader.class.getResourceAsStream("/MAPPA32/JSON/mappa25m_collisioni.json")) {
             if (jsonStream == null) throw new FileNotFoundException("File JSON non trovato!");
             Reader reader = new InputStreamReader(jsonStream);
             return new Gson().fromJson(reader, TileMap.class);
@@ -35,4 +41,32 @@ public class TileMapLoader {
             return null;
         }
     }
+    
+    public static boolean[][] loadCollisionMap(Map map) {
+        int width = map.getTileMap().getWidth();
+        int height = map.getTileMap().getHeight();
+
+        boolean[][] collisionMap = new boolean[height][width];
+
+        for (Layer layer : map.getTileMap().getLayers()) {
+            if (!layer.getName().equalsIgnoreCase("Collision")) continue;
+
+            int[] flatData = layer.getData(); 
+
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    int index = y * width + x;
+                    if (index < flatData.length && flatData[index] != 0) {
+                        collisionMap[y][x] = true;
+                    }
+                }
+            }
+            break; 
+        }
+
+        return collisionMap;
+    }
+
+
+
 }

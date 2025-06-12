@@ -1,10 +1,10 @@
 package donkeykongvsmario.model;
 public class Layer {
-    public String name;
-    public String type;
-    public int[] data; // flat array representing the map
-    public int width;
-    public int height;
+    private String name;
+    private String type;
+    private int[] data; // flat array representing the map
+    private int width;
+    private int height;
     
     public Layer() {
     	
