@@ -1,8 +1,10 @@
 package donkeykongvsmario.view;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 
 import javax.swing.JFrame;
+import javax.swing.OverlayLayout;
 
 import donkeykongvsmario.controller.GameInputHandler;
 
@@ -15,10 +17,14 @@ public class GameWindow extends JFrame {
 		setBackground(Color.BLACK);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
+		setLayout(new BorderLayout());
+		
 		UniversePanel uniPanel = new UniversePanel();
-		add(uniPanel);
+		add(uniPanel, BorderLayout.CENTER);
 		
 		addKeyListener(new GameInputHandler());
+		
+		setVisible(true);
 	}
 	
 	
