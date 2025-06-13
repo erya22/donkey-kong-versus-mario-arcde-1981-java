@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import donkeykongvsmario.obspattern.Observer;
+import donkeykongvsmario.utils.GameConfigurator;
 
 public class Player extends Entity {
 	private static final Logger log = LoggerFactory.getLogger(Player.class);
@@ -59,8 +60,8 @@ public class Player extends Entity {
 	
 	public void setDefaultValues()  {
 		
-		this.setX(0);
-		this.setY(0);
+		this.setX((GameConfigurator.SCREEN_WIDTH - GameConfigurator.MAP_WIDTH) / 2);
+		this.setY(30 * GameConfigurator.TILE_SIZE);
 		
 		this.setVelocityY(4);
 		this.setVelocityX(4);

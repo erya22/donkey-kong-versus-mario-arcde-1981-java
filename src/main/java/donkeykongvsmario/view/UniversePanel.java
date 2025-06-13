@@ -188,7 +188,6 @@ public class UniversePanel extends JPanel {
 		mapPanel.render(g2, offsetX, offsetY);
 //		g2.translate(offsetX, offsetY);
 		playerView.draw(g2);
-		
 //		g2.translate(-offsetX, -offsetY);
 		
 		g2.setColor(Color.RED);
