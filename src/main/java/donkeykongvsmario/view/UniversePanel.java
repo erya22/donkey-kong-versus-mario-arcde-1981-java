@@ -1,5 +1,6 @@
 package donkeykongvsmario.view;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -189,6 +190,11 @@ public class UniversePanel extends JPanel {
 		playerView.draw(g2);
 		
 //		g2.translate(-offsetX, -offsetY);
+		
+		g2.setColor(Color.RED);
+	    g2.setStroke(new BasicStroke(5)); // Spessore del bordo
+	    g2.drawRect(offsetX, offsetY, mapWidth, mapHeight);
+
 	}
 
 	
