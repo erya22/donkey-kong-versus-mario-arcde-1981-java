@@ -8,11 +8,11 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import donkeykongvsmario.model.Animation;
+import donkeykongvsmario.model.ActionState;
+import donkeykongvsmario.model.AnimationType;
 import donkeykongvsmario.model.Direction;
-import donkeykongvsmario.model.MovementState;
+import donkeykongvsmario.model.LifeState;
 import donkeykongvsmario.model.Player;
-import donkeykongvsmario.model.State;
 import donkeykongvsmario.obspattern.Observer;
 import donkeykongvsmario.view.PlayerView;
 
@@ -30,84 +30,27 @@ public class PlayerController implements Observer, KeyListener {
 	
 	@Override
 	public void update() {
-		if (player.getState() == State.DEAD || player.getState() == State.HIT) return;
+		if (player.getLifeState() == LifeState.DEAD || player.getActionState() == ActionState.HIT) return;
 		
 		//TODO: DA AGGIUNGERE SISTEMA CHE GESTISCE LA FISICA
 		
-		if (player.getState() == State.INVINCIBLE) {
+		if (player.getLifeState() == LifeState.INVINCIBLE) {
             long elapsed = System.currentTimeMillis() - player.getStateTime();
             if (elapsed >= player.getIMMUNITY()) {
-                player.setState(State.ALIVE); 
+                player.setLifeState(LifeState.ALIVE); 
             }
     	}
 	}
-	
-	// Nel PlayerController
-//	public void moveRight() {
-//	    player.setX(player.getX() + player.getVelocityX());
-//	    notifyView();
-//	}
-//	
-//	public void moveLeft() {
-//		player.setX(player.getX() - player.getVelocityX());
-//		notifyView();
-//	}
-//	
-//	public void climbUp() {
-//		player.setY(player.getY() - player.getVelocityY());
-//		notifyView();
-//	}
-//	
-//	public void climbDown() {
-//		player.setY(player.getY() + player.getVelocityY());
-//		notifyView();
-//	}
-	
-//	public void moveRight() {
-//	    player.move(player.getVelocityX(), 0);
-//	    notifyView();
-//	}
-//
-//	public void moveLeft() {
-//	    player.move(-player.getVelocityX(), 0);
-//	    notifyView();
-//	}
-//
-//	public void climbUp() {
-//	    player.move(0, -player.getVelocityY());
-//	    notifyView();
-//	}
-//
-//	public void climbDown() {
-//	    player.move(0, player.getVelocityY());
-//	    notifyView();
-//	}
 
 	
 	//TODO:
 	public void jump() {
-	    if (player.getMovement() != MovementState.JUMP) {
-	        player.setMovement(MovementState.JUMP);
-	        notifyView();
-	    }
+//	    if (player.getMovement() != MovementState.JUMP) {
+//	        player.setMovement(MovementState.JUMP);
+//	        notifyView();
+//	    }
 	}
 
-//	public void processInput(KeyEvent e) {
-//	    int keyPressed = e.getKeyCode();
-//	    if (keyPressed == KeyEvent.VK_RIGHT) {
-//	        player.move();  // prova a muovere Mario a destra di 5 pixel
-//	    } else if (keyPressed == KeyEvent.VK_LEFT) {
-//	        player.move(-5, 0); // muovi a sinistra
-//	    } else if (keyPressed == KeyEvent.VK_UP) {
-//	        player.move(0, -5); // sali
-//	    } else if (keyPressed == KeyEvent.VK_DOWN) {
-//	        player.move(0, 5);  // scendi
-//	    }
-//	    notifyView();
-//	}
-
-
-	
 	public void notifyView() {
         playerView.updateView(player);  // La View si aggiorna con i dati del Model
     }
@@ -126,19 +69,19 @@ public class PlayerController implements Observer, KeyListener {
 		switch (e.getKeyCode()) {
         case KeyEvent.VK_LEFT:
             player.setDirection(Direction.LEFT);
-            player.setAnimation(Animation.WALKL);
-            player.walk(player.getAnimation());
+            player.setAnimationType(AnimationType.WALK_LEFT);
+            player.walk(player.getDirection());
             break;
         case KeyEvent.VK_RIGHT:
         	player.setDirection(Direction.RIGHT);
-            player.setAnimation(Animation.WALKR);
-            player.walk(player.getAnimation());
+            player.setAnimationType(AnimationType.WALK_RIGHT);
+            player.walk(player.getDirection());
             break;
         case KeyEvent.VK_UP:
-            player.climb(MovementState.UPCLIMB);
+//            player.climb(MovementState.UPCLIMB);
             break;
         case KeyEvent.VK_DOWN:
-            player.climb(MovementState.DOWNCLIMB);
+//            player.climb(MovementState.DOWNCLIMB);
             break;
         case KeyEvent.VK_SPACE:
         	//TODO
@@ -152,24 +95,52 @@ public class PlayerController implements Observer, KeyListener {
 	
 	//AGGIUNGERE IDLEL
 	@Override
-    public void keyReleased(KeyEvent e) {
-        keysPressed.remove(e.getKeyCode());
-        notifyView();
-    }
+	public void keyReleased(KeyEvent e) {
+	    keysPressed.remove(e.getKeyCode());
+
+	    // Imposta IDLE solo se nessun altro tasto di movimento è premuto
+	    if (!keysPressed.contains(KeyEvent.VK_LEFT) && !keysPressed.contains(KeyEvent.VK_RIGHT)) {
+	        player.setActionState(ActionState.IDLE);
+	        player.setAnimationType(AnimationType.IDLE_RIGHT); 
+	        player.setCurrentFrameIndex(0);  // Forza il primo frame idle
+	        log.debug("Tasto rilasciato: Mario ora è IDLE");
+
+	    }
+
+	    notifyView();
+	}
 	
 	
 	public void update(float deltaTime) {
-		if (player.getState() == State.DEAD || player.getState() == State.HIT) return;
+		if (player.getLifeState() == LifeState.DEAD || player.getActionState() == ActionState.HIT) return;
     	
 //    	player.updatePhysics();
     	
-    	if (player.getState() == State.INVINCIBLE) {
+    	if (player.getLifeState() == LifeState.INVINCIBLE) {
             long elapsed = System.currentTimeMillis() - player.getStateTime();
             if (elapsed >= player.getIMMUNITY()) {
-                player.setState(State.ALIVE); 
+                player.setLifeState(LifeState.ALIVE); 
             }
     	}
 	}
+
+	public Player getPlayer() {
+		return player;
+	}
+
+	public void setPlayer(Player player) {
+		this.player = player;
+	}
+
+	public PlayerView getPlayerView() {
+		return playerView;
+	}
+
+	public void setPlayerView(PlayerView playerView) {
+		this.playerView = playerView;
+	}
+	
+	
 
 	
 	

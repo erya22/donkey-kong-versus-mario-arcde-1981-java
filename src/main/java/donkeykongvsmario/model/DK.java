@@ -9,7 +9,7 @@ import javax.imageio.ImageIO;
 public class DK extends Entity {
 
 	//STATO DK
-	private State state;
+	LifeState state;
 	private HashMap<String, BufferedImage[]> spriteMap;
 	
 	
@@ -71,14 +71,6 @@ public class DK extends Entity {
 
 	public void setSpriteMap(HashMap<String, BufferedImage[]> spriteMap) {
 		this.spriteMap = spriteMap;
-	}
-
-	public State getState() {
-		return state;
-	}
-
-	public void setState(State state) {
-		this.state = state;
 	}
 
 	public String[] getActionCycle() {

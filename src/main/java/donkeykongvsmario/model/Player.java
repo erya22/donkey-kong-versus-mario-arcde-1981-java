@@ -2,6 +2,7 @@ package donkeykongvsmario.model;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,14 +18,10 @@ public class Player extends Entity {
 	private static final Logger log = LoggerFactory.getLogger(Player.class);
 	
 	private List<Observer> observers = new ArrayList<>();
-
-	private MovementState movement;
-	private State state;
-	private Animation animation;
 	
 	private int jumpStrenght = 15;
 	
-	private int vite;
+	private int vite = 3;
 	
 	//state time al posto di invincible times
 	private long stateTime;
@@ -37,14 +34,14 @@ public class Player extends Entity {
 	
 	private  int highscore;
 	
-	private HashMap<Animation, BufferedImage[]> spriteMap;
-	
 	private BufferedImage[] currentSpriteMap;
+	
+	private HashMap<SimpleEntry<ActionState, Direction>, BufferedImage[]> animations;
+	private AnimationType animationType;
 	
 	public Player(Universe universe, String name) {
 		super(universe, name);
 
-		this.spriteMap = new HashMap<Animation, BufferedImage[]>();
 		getPlayerImage();
 		setDefaultValues();
 	}
@@ -70,12 +67,13 @@ public class Player extends Entity {
 		
 		this.setDirection(Direction.RIGHT);
 		this.setTerrain(Terrain.BEAM);
-		this.setState(State.ALIVE);
-		this.setAnimation(Animation.IDLER);
-		this.setMovement(MovementState.IDLE);
+		this.setAnimationType(AnimationType.IDLE_RIGHT);
+		
 		
 		this.setLastFrameTime(0);
 		this.setCurrentFrameIndex(0);
+		
+		this.setFrameIndex((int) ((System.currentTimeMillis() - this.getHIT_DURATION()) / (this.getHIT_DURATION() / 5)));
 		
 		
 	}
@@ -90,68 +88,82 @@ public class Player extends Entity {
 		this.currentFrameIndex = currentFrameIndex;
 	}
 
-	public HashMap<Animation, BufferedImage[]> getSpriteMap() {
-		return spriteMap;
-	}
-
-	public void setSpriteMap(HashMap<Animation, BufferedImage[]> spriteMap) {
-		this.spriteMap = spriteMap;
-	}
-
 	public void getPlayerImage() {
+		 this.animations = new HashMap<>();
+
+		
         try {
             // UP/DOWN
             BufferedImage[] up = new BufferedImage[7];
             for (int i = 0; i < 7; i++) {
                 up[i] = ImageIO.read(getClass().getResourceAsStream("/PLAYER/b" + (i+1) + ".png"));
             }
-            spriteMap.put(Animation.CLIMBU, up);
-            spriteMap.put(Animation.CLIMBD, up);
-
+            BufferedImage[] down = new BufferedImage[7];
+            for (int i = 6; i >= 0; i--) {
+                down[6 - i] = ImageIO.read(getClass().getResourceAsStream("/PLAYER/b" + (i + 1) + ".png"));
+            }
+            animations.put(new SimpleEntry<>(ActionState.CLIMBING_UP, Direction.NONE), up);
+            animations.put(new SimpleEntry<>(ActionState.CLIMBING_DOWN, Direction.NONE), down);
+            
             // RIGHT
             BufferedImage[] right = new BufferedImage[4];
             for (int i = 0; i < 4; i++) {
                 right[i] = ImageIO.read(getClass().getResourceAsStream("/PLAYER/a" + (i + 1) + ".png"));
             }
+            animations.put(new SimpleEntry<>(ActionState.WALKING, Direction.RIGHT), right);
+ 
             BufferedImage[] idleR = new BufferedImage[1];
             idleR[0] = ImageIO.read(getClass().getResourceAsStream("/PLAYER/a" + 1 + ".png"));
-            spriteMap.put(Animation.WALKR, right);
-            spriteMap.put(Animation.IDLER, idleR);
+            animations.put(new SimpleEntry<>(ActionState.IDLE, Direction.RIGHT), idleR);
+
             // LEFT
             BufferedImage[] left = new BufferedImage[4];
             for (int i = 0; i < 4; i++) {
                 left[i] = ImageIO.read(getClass().getResourceAsStream("/PLAYER/m" + (i + 1) + ".png"));
             }
-            spriteMap.put(Animation.WALKL, left);
+            animations.put(new SimpleEntry<>(ActionState.WALKING, Direction.LEFT), left);
+
             BufferedImage[] idleL = new BufferedImage[1];
             idleL[0] = ImageIO.read(getClass().getResourceAsStream("/PLAYER/m" + 1 + ".png"));
-            spriteMap.put(Animation.IDLEL, idleL);
-            
+            animations.put(new SimpleEntry<>(ActionState.IDLE, Direction.LEFT), idleL);
+
             // JUMP ANIMATION
             BufferedImage[] jumpR = new BufferedImage[1];
             jumpR[0] = ImageIO.read(getClass().getResourceAsStream("/PLAYER/c3.png"));
-            spriteMap.put(Animation.JUMPR, jumpR);
+            animations.put(new SimpleEntry<>(ActionState.JUMPING, Direction.RIGHT), jumpR);
+
             BufferedImage[] jumpL = new BufferedImage[1];
             jumpL[0] = ImageIO.read(getClass().getResourceAsStream("/PLAYER/m3.png"));
-            spriteMap.put(Animation.JUMPL, jumpL);
+            animations.put(new SimpleEntry<>(ActionState.JUMPING, Direction.LEFT), jumpL);
 
             BufferedImage[] hitFramesR = new BufferedImage[5];
             // DEATH ANIMATION
             for (int i = 0; i < 5; i++) {
                 hitFramesR[i] = ImageIO.read(getClass().getResourceAsStream("/PLAYER/e" + (i + 1) + ".png"));
+            }            
+            animations.put(new SimpleEntry<>(ActionState.HIT, Direction.RIGHT), hitFramesR);
+
+            BufferedImage[] hitFramesL = new BufferedImage[5];
+            for (int i = 0; i < 5; i++) {
+                hitFramesL[i] = ImageIO.read(getClass().getResourceAsStream("/PLAYER/e" + (5 - i) + ".png"));
             }
-            
-            spriteMap.put(Animation.HITR, hitFramesR);
-            
-            BufferedImage[] hitFramesL = new BufferedImage[6];
-            for (int i = 5; i > 0; i--) {
-            	hitFramesL[i] = ImageIO.read(getClass().getResourceAsStream("/PLAYER/e" + i + ".png"));	
-            }
+            animations.put(new SimpleEntry<>(ActionState.HIT, Direction.LEFT), hitFramesL);
 
 
+            
         } catch (IOException e) {
             e.printStackTrace();
         }
+	}
+	
+	
+
+	public HashMap<SimpleEntry<ActionState, Direction>, BufferedImage[]> getAnimations() {
+		return animations;
+	}
+
+	public void setAnimations(HashMap<SimpleEntry<ActionState, Direction>, BufferedImage[]> animations) {
+		this.animations = animations;
 	}
 
 	public long getLastFrameTime() {
@@ -164,30 +176,6 @@ public class Player extends Entity {
 
 	public long getFrameDelay() {
 		return frameDelay;
-	}
-
-	public Animation getAnimation() {
-		return animation;
-	}
-
-	public void setAnimation(Animation animation) {
-		this.animation = animation;
-	}
-
-	public MovementState getMovement() {
-		return movement;
-	}
-
-	public void setMovement(MovementState movement) {
-		this.movement = movement;
-	}
-
-	public State getState() {
-		return state;
-	}
-
-	public void setState(State state) {
-		this.state = state;
 	}
 
 	public int getJumpStrenght() {
@@ -230,25 +218,42 @@ public class Player extends Entity {
 		return HIT_DURATION;
 	}
 	
-	public void climb(MovementState movement) {
-		
+	public void walk(Direction direction) {
+	    log.info("Mario si muove verso {} ", direction);
+	    setActionState(ActionState.WALKING);
+
+	    switch (direction) {
+	        case RIGHT:
+	            setDirection(Direction.RIGHT);
+	            BufferedImage[] rightAnim = getAnimations(ActionState.WALKING, Direction.RIGHT);
+	            if (rightAnim != null) {
+	                setCurrentSpriteMap(rightAnim);
+	                this.setX(getX() + this.getVelocityX());
+	            } else {
+	                log.error("Right walking animation is null!");
+	            }
+	            break;
+	        case LEFT:
+	            setDirection(Direction.LEFT);
+	            BufferedImage[] leftAnim = getAnimations(ActionState.WALKING, Direction.LEFT);
+	            if (leftAnim != null) {
+	                setCurrentSpriteMap(leftAnim);
+	                this.setX(getX() - this.getVelocityX());
+	            } else {
+	                log.error("Left walking animation is null!");
+	            }
+	            break;
+	        default:
+	            log.warn("Direzione non gestita: {}", direction);
+	            break;
+	    }
 	}
+
 	
-	public void walk(Animation direction) {
-		log.info("Mario si muove verso {} ", direction);
-		switch (direction) {
-        case WALKR:
-        	this.setMovement(MovementState.WALK);
-        	this.setAnimation(Animation.WALKR);
-            this.setX(getX() + this.getVelocityX());
-            break;
-        case WALKL:
-        	this.setMovement(MovementState.WALK);
-        	this.setAnimation(Animation.WALKL);
-        	this.setX(getX() - this.getVelocityX());
-            break;
-		}
+	public BufferedImage[] getAnimations(ActionState action, Direction dir) {
+	    return animations.get(new SimpleEntry<>(action, dir));
 	}
+
 	
 	public BufferedImage[] getCurrentSpriteMap() {
 		return currentSpriteMap;
@@ -256,6 +261,14 @@ public class Player extends Entity {
 
 	public void setCurrentSpriteMap(BufferedImage[] currentSpriteMap) {
 		this.currentSpriteMap = currentSpriteMap;
+	}
+
+	public AnimationType getAnimationType() {
+		return animationType;
+	}
+
+	public void setAnimationType(AnimationType animationType) {
+		this.animationType = animationType;
 	}
 	
 //	public void move(int dx, int dy) {
@@ -273,18 +286,20 @@ public class Player extends Entity {
 //	    }
 //	}
 
-	public void idle() {
-		if (getTerrain() != Terrain.AIR) {
-			return;
-		}
-		switch(getMovement()) {
-			case JUMP: 
-				this.setMovement(MovementState.FALL);
-				this.setVelocityY(0);
-				break;
-			
-		}
-		
-	}
+//	public void idle() {
+//		if (getTerrain() != Terrain.AIR) {
+//			return;
+//		}
+//		switch(getMovement()) {
+//			case JUMP: 
+//				this.setMovement(MovementState.FALL);
+//				this.setVelocityY(0);
+//				break;
+//			
+//		}
+//		
+//	}
+	
+	
 
 }

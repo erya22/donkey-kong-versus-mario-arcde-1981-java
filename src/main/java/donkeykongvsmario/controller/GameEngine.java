@@ -21,4 +21,25 @@ public class GameEngine {
 		playerController.update();
 	}
 	
+	public void updateAnimation(long currentTimeMillis) {
+	    if (playerController.getPlayer().getCurrentSpriteMap() == null || playerController.getPlayer().getCurrentSpriteMap().length == 0) return;
+
+	    if (currentTimeMillis - playerController.getPlayer().getLastFrameTime() >= playerController.getPlayer().getFrameDelay()) {
+	    	playerController.getPlayer().setCurrentFrameIndex((playerController.getPlayer().getCurrentFrameIndex() + 1) % playerController.getPlayer().getCurrentSpriteMap().length); 
+	    	playerController.getPlayer().setLastFrameTime(currentTimeMillis); 
+	    }
+	}
+
+	public PlayerController getPlayerController() {
+		return playerController;
+	}
+
+	public void setPlayerController(PlayerController playerController) {
+		this.playerController = playerController;
+	}
+	
+	
+	
+
+	
 }

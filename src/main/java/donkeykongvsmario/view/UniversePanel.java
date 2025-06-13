@@ -11,7 +11,11 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.Timer;
 
-import donkeykongvsmario.model.Animation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import donkeykongvsmario.model.ActionState;
+import donkeykongvsmario.model.AnimationType;
 import donkeykongvsmario.model.Direction;
 import donkeykongvsmario.model.Map;
 import donkeykongvsmario.model.Player;
@@ -19,6 +23,7 @@ import donkeykongvsmario.model.Universe;
 import donkeykongvsmario.utils.GameConfigurator;
 
 public class UniversePanel extends JPanel {
+	private static final Logger log = LoggerFactory.getLogger(UniversePanel.class);
 
 	private Map map;
 	private MapRenderer mapPanel;
@@ -32,6 +37,8 @@ public class UniversePanel extends JPanel {
 	 * Si occupa di gestire le view di tutte le entità di gioco.
 	 */
 	public UniversePanel(Universe universe) {
+		log.info("UniverseView created");
+		
 		setBackground(Color.BLACK);
 
 		setLayout(null);
@@ -77,29 +84,34 @@ public class UniversePanel extends JPanel {
         im.put(KeyStroke.getKeyStroke("pressed RIGHT"), "moveRight");
         am.put("moveRight", new AbstractAction() {
             public void actionPerformed(java.awt.event.ActionEvent e) {
-                player.walk(Animation.WALKR);
+                player.walk(Direction.RIGHT);
             }
         });
 
         im.put(KeyStroke.getKeyStroke("released RIGHT"), "stopRight");
         am.put("stopRight", new AbstractAction() {
-            public void actionPerformed(java.awt.event.ActionEvent e) {
-                player.idle();
+        	public void actionPerformed(java.awt.event.ActionEvent e) {
+                player.setActionState(ActionState.IDLE);
+                player.setAnimationType(AnimationType.IDLE_RIGHT);
+                player.setCurrentFrameIndex(0); // Assicura il primo frame idle
             }
+
         });
 
         // Freccia sinistra - walk left
         im.put(KeyStroke.getKeyStroke("pressed LEFT"), "moveLeft");
         am.put("moveLeft", new AbstractAction() {
             public void actionPerformed(java.awt.event.ActionEvent e) {
-                player.walk(Animation.WALKL);
+                player.walk(Direction.LEFT);
             }
         });
 
         im.put(KeyStroke.getKeyStroke("released LEFT"), "stopLeft");
         am.put("stopLeft", new AbstractAction() {
-            public void actionPerformed(java.awt.event.ActionEvent e) {
-                player.idle();
+        	public void actionPerformed(java.awt.event.ActionEvent e) {
+                player.setActionState(ActionState.IDLE);
+                player.setAnimationType(AnimationType.IDLE_LEFT);
+                player.setCurrentFrameIndex(0);
             }
         });
 
@@ -107,7 +119,7 @@ public class UniversePanel extends JPanel {
         im.put(KeyStroke.getKeyStroke("pressed UP"), "climbUp");
         am.put("climbUp", new AbstractAction() {
             public void actionPerformed(java.awt.event.ActionEvent e) {
-                player.climb(player.getMovement());
+//                player.climb();
             }
         });
 
@@ -115,7 +127,7 @@ public class UniversePanel extends JPanel {
         im.put(KeyStroke.getKeyStroke("pressed DOWN"), "climbDown");
         am.put("climbDown", new AbstractAction() {
             public void actionPerformed(java.awt.event.ActionEvent e) {
-                player.climb(player.getMovement());
+//                player.climb(player.getMovement());
             }
         });
 
@@ -142,20 +154,16 @@ public class UniversePanel extends JPanel {
 		Player p = universe.getPlayer();
 		if (p == null) {
 			return;
-		}
 
-		if (currentActiveKeys.isEmpty()) {
-			p.idle();
-			return;
 		}
 
 		
 		for(Integer keycode: currentActiveKeys) {
 			switch(keycode) {
-				case KeyEvent.VK_UP: 	p.climb(p.getMovement());			 	break;
-				case KeyEvent.VK_DOWN: 	p.climb(p.getMovement()); 				break;
-				case KeyEvent.VK_RIGHT: p.walk(p.getAnimation());				break;
-				case KeyEvent.VK_LEFT:	p.walk(p.getAnimation());				break;
+				case KeyEvent.VK_UP: 	/*p.climb(p.getMovement());*/			 	break;
+				case KeyEvent.VK_DOWN: 	/*p.climb(p.getMovement());*/ 				break;
+				case KeyEvent.VK_RIGHT: p.walk(Direction.RIGHT);				break;
+				case KeyEvent.VK_LEFT:	p.walk(Direction.LEFT);				break;
 				case KeyEvent.VK_SPACE:					break;
 			}
 		}
@@ -178,7 +186,7 @@ public class UniversePanel extends JPanel {
 		
 		mapPanel.render(g2, offsetX, offsetY);
 //		g2.translate(offsetX, offsetY);
-		playerView.draw(g2, offsetX, offsetY);
+		playerView.draw(g2);
 		
 //		g2.translate(-offsetX, -offsetY);
 	}

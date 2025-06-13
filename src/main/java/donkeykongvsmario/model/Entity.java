@@ -1,6 +1,7 @@
 package donkeykongvsmario.model;
 
 import java.awt.image.BufferedImage;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.HashMap;
 
 import org.slf4j.Logger;
@@ -13,24 +14,86 @@ public class Entity {
 	
 	private int x, y;
 	private int velocityX, velocityY;
+	private int height, width;
 	
-	private Direction direction;
-	private Terrain terrain;
+	private Direction direction = Direction.RIGHT;
+	private Terrain terrain = Terrain.AIR;
+	
+	private int frameIndex = 0;
+	private int frameCounter = 0;
 	
 	private int spriteCounter;
 	private int spriteNum;
 	
 	private Universe universe;
 	
-	private int frameIndex;
+	private ActionState actionState = ActionState.IDLE;
+	private LifeState lifeState = LifeState.ALIVE;
 	
-	private int height, width;
+	private HashMap<SimpleEntry<ActionState, Direction>, BufferedImage[]> animations = new HashMap<>();
+	
 	
 	public Entity(Universe universe, String name) {
 		this.universe = universe;
 		this.name = name;
 	}
 	
+	public BufferedImage getCurrentFrame() {
+		SimpleEntry<ActionState, Direction> key = new SimpleEntry<>(actionState, direction);
+		BufferedImage[] frames = animations.get(key);
+		if (frames == null || frames.length == 0) return null;
+
+		frameCounter++;
+		if (frameCounter >= 10) { // cambia ogni 10 tick (regolabile)
+			frameIndex = (frameIndex + 1) % frames.length;
+			frameCounter = 0;
+		}
+		return frames[frameIndex];
+	}
+	
+	public int getFrameCounter() {
+		return frameCounter;
+	}
+
+	public void setFrameCounter(int frameCounter) {
+		this.frameCounter = frameCounter;
+	}
+
+	public HashMap<SimpleEntry<ActionState, Direction>, BufferedImage[]> getAnimations() {
+		return animations;
+	}
+
+	public void setAnimations(ActionState action, Direction direction, BufferedImage[] frames) {
+	    this.animations.put(new SimpleEntry<>(action, direction), frames);
+	}
+
+	public BufferedImage[] getAnimations(ActionState action, Direction direction) {
+	    return animations.get(new SimpleEntry<>(action, direction));
+	}
+
+	public void addAnimation(ActionState action, Direction dir, BufferedImage[] frames) {
+		animations.put(new SimpleEntry<>(action, dir), frames);
+	}
+	
+	public ActionState getActionState() {
+		return actionState;
+	}
+
+	public void setActionState(ActionState actionState) {
+		if (this.actionState != actionState) {
+			this.actionState = actionState;
+			frameIndex = 0;
+			frameCounter = 0;
+		}
+	}
+
+	public LifeState getLifeState() {
+		return lifeState;
+	}
+
+	public void setLifeState(LifeState lifeState) {
+		this.lifeState = lifeState;
+	}
 	
 
 	public int getHeight() {

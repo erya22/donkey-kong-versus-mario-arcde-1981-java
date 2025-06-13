@@ -1,9 +1,6 @@
 package donkeykongvsmario.model;
-
 public enum Direction {
-	RIGHT,
-	LEFT,
-	UP,
-	DOWN
-
+    LEFT,
+    RIGHT,
+    NONE // utile per scalata
 }
