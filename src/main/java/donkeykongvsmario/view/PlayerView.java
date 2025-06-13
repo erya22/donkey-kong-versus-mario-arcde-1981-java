@@ -44,10 +44,16 @@ public class PlayerView extends JComponent {
 	            image = (jumpFrames != null && jumpFrames.length > 0)
 	                    ? jumpFrames[0]
 	                    : player.getSpriteMap().get(player.getAnimation())[0];  // backup sicuro
-	        } else if (player.getMovement() == MovementState.IDLE) {
-	        	BufferedImage[] frames = player.getSpriteMap().get(Animation.IDLE);
+	        } else if (player.getMovement() == MovementState.IDLE && player.getDirection() == Direction.RIGHT) {
+	        	BufferedImage[] frames = player.getSpriteMap().get(Animation.IDLER);
 	        	if (frames == null || frames.length == 0) {
-	        		frames = player.getSpriteMap().get(Animation.IDLE);
+	        		frames = player.getSpriteMap().get(Animation.IDLER);
+	        	}
+	        	image = frames[0];
+	        } else if (player.getMovement() == MovementState.IDLE && player.getDirection() == Direction.LEFT) {
+	        	BufferedImage[] frames = player.getSpriteMap().get(Animation.IDLEL);
+	        	if (frames == null || frames.length == 0) {
+	        		frames = player.getSpriteMap().get(Animation.IDLEL);
 	        	}
 	        	image = frames[0];
 	        } else {
@@ -66,7 +72,15 @@ public class PlayerView extends JComponent {
 	    	animate();
 		}
 	 
-	 public void update(Player player) {
+	 public void update() {
+		 long now = System.currentTimeMillis();
+		 if (now - player.getLastFrameTime() >= player.getFrameDelay()) {
+			 player.setCurrentFrameIndex((player.getCurrentFrameIndex() + 1) % player.getCurrentSpriteMap().length); 
+			 player.setLastFrameTime(now);
+		 }
+	 }
+	 
+	 public void updateView(Player player) {
 		 this.setPlayer(player);
 	 }
     
@@ -78,7 +92,8 @@ public class PlayerView extends JComponent {
 
 		 if (spriteCounter > 10) {
 			 spriteNum++;
-			 BufferedImage[] frames = player.getSpriteMap().get(player.getDirection());
+			 player.setCurrentSpriteMap(player.getSpriteMap().get(player.getAnimation()));
+			 BufferedImage[] frames = player.getCurrentSpriteMap();
 			 int maxFrame = frames != null ? frames.length : 1;
 			 if (spriteNum > maxFrame) {
 				 spriteNum = 1;

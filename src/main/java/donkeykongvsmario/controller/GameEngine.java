@@ -14,7 +14,7 @@ public class GameEngine {
 	}
 	
 	public void handleInput(KeyEvent e) {
-		playerController.processInput(e);
+		playerController.keyPressed(e);
 	}
 	
 	public void updateGame() {

@@ -2,10 +2,13 @@ package donkeykongvsmario.controller;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import donkeykongvsmario.model.Animation;
 import donkeykongvsmario.model.Direction;
 import donkeykongvsmario.model.MovementState;
 import donkeykongvsmario.model.Player;
@@ -60,25 +63,25 @@ public class PlayerController implements Observer, KeyListener {
 //		notifyView();
 //	}
 	
-	public void moveRight() {
-	    player.move(player.getVelocityX(), 0);
-	    notifyView();
-	}
-
-	public void moveLeft() {
-	    player.move(-player.getVelocityX(), 0);
-	    notifyView();
-	}
-
-	public void climbUp() {
-	    player.move(0, -player.getVelocityY());
-	    notifyView();
-	}
-
-	public void climbDown() {
-	    player.move(0, player.getVelocityY());
-	    notifyView();
-	}
+//	public void moveRight() {
+//	    player.move(player.getVelocityX(), 0);
+//	    notifyView();
+//	}
+//
+//	public void moveLeft() {
+//	    player.move(-player.getVelocityX(), 0);
+//	    notifyView();
+//	}
+//
+//	public void climbUp() {
+//	    player.move(0, -player.getVelocityY());
+//	    notifyView();
+//	}
+//
+//	public void climbDown() {
+//	    player.move(0, player.getVelocityY());
+//	    notifyView();
+//	}
 
 	
 	//TODO:
@@ -89,24 +92,24 @@ public class PlayerController implements Observer, KeyListener {
 	    }
 	}
 
-	public void processInput(KeyEvent e) {
-	    int keyPressed = e.getKeyCode();
-	    if (keyPressed == KeyEvent.VK_RIGHT) {
-	        player.move(5, 0);  // prova a muovere Mario a destra di 5 pixel
-	    } else if (keyPressed == KeyEvent.VK_LEFT) {
-	        player.move(-5, 0); // muovi a sinistra
-	    } else if (keyPressed == KeyEvent.VK_UP) {
-	        player.move(0, -5); // sali
-	    } else if (keyPressed == KeyEvent.VK_DOWN) {
-	        player.move(0, 5);  // scendi
-	    }
-	    notifyView();
-	}
+//	public void processInput(KeyEvent e) {
+//	    int keyPressed = e.getKeyCode();
+//	    if (keyPressed == KeyEvent.VK_RIGHT) {
+//	        player.move();  // prova a muovere Mario a destra di 5 pixel
+//	    } else if (keyPressed == KeyEvent.VK_LEFT) {
+//	        player.move(-5, 0); // muovi a sinistra
+//	    } else if (keyPressed == KeyEvent.VK_UP) {
+//	        player.move(0, -5); // sali
+//	    } else if (keyPressed == KeyEvent.VK_DOWN) {
+//	        player.move(0, 5);  // scendi
+//	    }
+//	    notifyView();
+//	}
 
 
 	
 	public void notifyView() {
-        playerView.update(player);  // La View si aggiorna con i dati del Model
+        playerView.updateView(player);  // La View si aggiorna con i dati del Model
     }
 
 	@Override
@@ -114,17 +117,22 @@ public class PlayerController implements Observer, KeyListener {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	private Set<Integer> keysPressed = new HashSet<>();
 
 	@Override
 	public void keyPressed(KeyEvent e) {
+		keysPressed.add(e.getKeyCode());
 		switch (e.getKeyCode()) {
         case KeyEvent.VK_LEFT:
             player.setDirection(Direction.LEFT);
-            player.walk(player.getDirection());
+            player.setAnimation(Animation.WALKL);
+            player.walk(player.getAnimation());
             break;
         case KeyEvent.VK_RIGHT:
-            player.setDirection(Direction.RIGHT);
-            player.walk(player.getDirection());
+        	player.setDirection(Direction.RIGHT);
+            player.setAnimation(Animation.WALKR);
+            player.walk(player.getAnimation());
             break;
         case KeyEvent.VK_UP:
             player.climb(MovementState.UPCLIMB);
@@ -137,17 +145,21 @@ public class PlayerController implements Observer, KeyListener {
             break;
 		}
 		
+		notifyView();
+		
 	}
 
 	
-	
+	//AGGIUNGERE IDLEL
 	@Override
-	public void keyReleased(KeyEvent e) {
-		player.setMovement(MovementState.IDLE);
-	}
+    public void keyReleased(KeyEvent e) {
+        keysPressed.remove(e.getKeyCode());
+        notifyView();
+    }
+	
 	
 	public void update(float deltaTime) {
-if (player.getState() == State.DEAD || player.getState() == State.HIT) return;
+		if (player.getState() == State.DEAD || player.getState() == State.HIT) return;
     	
 //    	player.updatePhysics();
     	

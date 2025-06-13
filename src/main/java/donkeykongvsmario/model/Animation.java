@@ -9,6 +9,7 @@ public enum Animation {
 	CLIMBD,
 	HITR,
 	HITL,
-	IDLE
+	IDLER,
+	IDLEL
 
 }

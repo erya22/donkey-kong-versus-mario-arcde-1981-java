@@ -31,11 +31,15 @@ public class Player extends Entity {
 	private final int IMMUNITY = 2000;
 	private final long HIT_DURATION = 1500;
 	
+	private final long frameDelay = 100;
+	private long lastFrameTime;
+	private int currentFrameIndex;
+	
 	private  int highscore;
 	
 	private HashMap<Animation, BufferedImage[]> spriteMap;
 	
-	private BufferedImage currentSprite;
+	private BufferedImage[] currentSpriteMap;
 	
 	public Player(Universe universe, String name) {
 		super(universe, name);
@@ -61,17 +65,31 @@ public class Player extends Entity {
 		this.setX(0);
 		this.setY(0);
 		
-		this.setVelocityY(0);
-		this.setVelocityX(0);
+		this.setVelocityY(4);
+		this.setVelocityX(4);
 		
 		this.setDirection(Direction.RIGHT);
 		this.setTerrain(Terrain.BEAM);
 		this.setState(State.ALIVE);
-		this.setAnimation(Animation.IDLE);
+		this.setAnimation(Animation.IDLER);
 		this.setMovement(MovementState.IDLE);
+		
+		this.setLastFrameTime(0);
+		this.setCurrentFrameIndex(0);
+		
 		
 	}
 	
+	
+	
+	public int getCurrentFrameIndex() {
+		return currentFrameIndex;
+	}
+
+	public void setCurrentFrameIndex(int currentFrameIndex) {
+		this.currentFrameIndex = currentFrameIndex;
+	}
+
 	public HashMap<Animation, BufferedImage[]> getSpriteMap() {
 		return spriteMap;
 	}
@@ -95,14 +113,19 @@ public class Player extends Entity {
             for (int i = 0; i < 4; i++) {
                 right[i] = ImageIO.read(getClass().getResourceAsStream("/PLAYER/a" + (i + 1) + ".png"));
             }
+            BufferedImage[] idleR = new BufferedImage[1];
+            idleR[0] = ImageIO.read(getClass().getResourceAsStream("/PLAYER/a" + 1 + ".png"));
             spriteMap.put(Animation.WALKR, right);
-            spriteMap.put(Animation.IDLE, right);
+            spriteMap.put(Animation.IDLER, idleR);
             // LEFT
             BufferedImage[] left = new BufferedImage[4];
             for (int i = 0; i < 4; i++) {
                 left[i] = ImageIO.read(getClass().getResourceAsStream("/PLAYER/m" + (i + 1) + ".png"));
             }
             spriteMap.put(Animation.WALKL, left);
+            BufferedImage[] idleL = new BufferedImage[1];
+            idleL[0] = ImageIO.read(getClass().getResourceAsStream("/PLAYER/m" + 1 + ".png"));
+            spriteMap.put(Animation.IDLEL, idleL);
             
             // JUMP ANIMATION
             BufferedImage[] jumpR = new BufferedImage[1];
@@ -129,6 +152,18 @@ public class Player extends Entity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+	}
+
+	public long getLastFrameTime() {
+		return lastFrameTime;
+	}
+
+	public void setLastFrameTime(long lastFrameTime) {
+		this.lastFrameTime = lastFrameTime;
+	}
+
+	public long getFrameDelay() {
+		return frameDelay;
 	}
 
 	public Animation getAnimation() {
@@ -199,32 +234,44 @@ public class Player extends Entity {
 		
 	}
 	
-	public void walk(Direction direction) {
-		
+	public void walk(Animation direction) {
+		log.info("Mario si muove verso {} ", direction);
+		switch (direction) {
+        case WALKR:
+        	this.setMovement(MovementState.WALK);
+        	this.setAnimation(Animation.WALKR);
+            this.setX(getX() + this.getVelocityX());
+            break;
+        case WALKL:
+        	this.setMovement(MovementState.WALK);
+        	this.setAnimation(Animation.WALKL);
+        	this.setX(getX() - this.getVelocityX());
+            break;
+		}
 	}
 	
-	public BufferedImage getCurrentSprite() {
-		return currentSprite;
+	public BufferedImage[] getCurrentSpriteMap() {
+		return currentSpriteMap;
 	}
 
-	public void setCurrentSprite(BufferedImage currentSprite) {
-		this.currentSprite = currentSprite;
+	public void setCurrentSpriteMap(BufferedImage[] currentSpriteMap) {
+		this.currentSpriteMap = currentSpriteMap;
 	}
-
-	public void move(int dx, int dy) {
-	    int newX = this.getX() + dx;
-	    int newY = this.getY() + dy;
-
-	    // usa l'universo per verificare la collisione
-	    if (!getUniverse().checkCollision(newX, newY, getWidth(), getHeight())) {
-	        // nessuna collisione, aggiorna posizione
-	        this.setX(newX);
-	        this.setY(newY);
-	    } else {
-	        // collisione, blocca movimento
-	        System.out.println("Collisione rilevata, movimento bloccato");
-	    }
-	}
+	
+//	public void move(int dx, int dy) {
+//	    int newX = this.getX() + dx;
+//	    int newY = this.getY() + dy;
+//
+//	    // usa l'universo per verificare la collisione
+//	    if (!getUniverse().checkCollision(newX, newY, getWidth(), getHeight())) {
+//	        // nessuna collisione, aggiorna posizione
+//	        this.setX(newX);
+//	        this.setY(newY);
+//	    } else {
+//	        // collisione, blocca movimento
+//	        System.out.println("Collisione rilevata, movimento bloccato");
+//	    }
+//	}
 
 	public void idle() {
 		if (getTerrain() != Terrain.AIR) {
