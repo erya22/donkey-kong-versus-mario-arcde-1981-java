@@ -24,10 +24,38 @@ public class Entity {
 	
 	private int frameIndex;
 	
+	private int height, width;
+	
 	public Entity(Universe universe, String name) {
 		this.universe = universe;
 		this.name = name;
 	}
+	
+	
+
+	public int getHeight() {
+		return height;
+	}
+
+
+
+	public void setHeight(int height) {
+		this.height = height;
+	}
+
+
+
+	public int getWidth() {
+		return width;
+	}
+
+
+
+	public void setWidth(int width) {
+		this.width = width;
+	}
+
+
 
 	public int getX() {
 		return x;

@@ -31,6 +31,24 @@ public class Universe {
 
 		
 	}
+	
+	public boolean checkCollision(int x, int y, int width, int height) {
+	    for (CollisionObject obj : collisionObjects) {
+	        int objX = obj.getX();
+	        int objY = obj.getY();
+	        int objWidth = obj.getWidth();
+	        int objHeight = obj.getHeight();
+
+	        boolean collisionX = x < objX + objWidth && x + width > objX;
+	        boolean collisionY = y < objY + objHeight && y + height > objY;
+
+	        if (collisionX && collisionY) {
+	            return true;  // collisione trovata
+	        }
+	    }
+	    return false; // nessuna collisione
+	}
+
 
 	public Map getMap() {
 		return map;

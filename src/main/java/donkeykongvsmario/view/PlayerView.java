@@ -25,65 +25,50 @@ public class PlayerView extends JComponent {
 		this.player = player;
 	}
 	
-	public void update(Player player) {
-		
-		//Serve per settare le sprite
-		if (player.getState() == State.HIT) {
-			
-		} else if (player.getMovement() == MovementState.JUMP) {
-			
-		} else if (player.getMovement() == MovementState.DOWNCLIMB) {
-			
-		} else if (player.getMovement() == MovementState.UPCLIMB) {
-			
-		} else if (player.getMovement() == MovementState.WALK) {
-			
-			if (player.getDirection() == Direction.RIGHT) {
-				
-			} else {
-				
-			}
-		} 
-		repaint();
-	}
-    
-    public void draw(Graphics g) {
-		Graphics2D g2 = (Graphics2D) g;
-		BufferedImage image;
+	 public void draw(Graphics g, int offsetX, int offsetY) {
+			Graphics2D g2 = (Graphics2D) g;
+			BufferedImage image;
 
-		//state time è sia per hit che per invincible
-    	if (player.getState() == State.HIT) {
-            int frameIndex = (int) ((System.currentTimeMillis() - player.getStateTime()) / (player.getHIT_DURATION() / 5));
-            frameIndex = Math.min(frameIndex, 4); // evita IndexOutOfBounds
-            BufferedImage[] hitFrames = player.getSpriteMap().get(player.getAnimation());
-            image = hitFrames != null ? hitFrames[frameIndex] : null;
-        } else if (player.getMovement() == MovementState.JUMP) {
-        	Animation animation = (player.getDirection() == Direction.RIGHT) ? Animation.JUMPR : Animation.JUMPL;
-        	BufferedImage[] jumpFrames = player.getSpriteMap().get(animation);
-            image = (jumpFrames != null && jumpFrames.length > 0)
-                    ? jumpFrames[0]
-                    : player.getSpriteMap().get(player.getAnimation())[0];  // backup sicuro
-        } else if (player.getMovement() == MovementState.IDLE) {
-        	BufferedImage[] frames = player.getSpriteMap().get(player.getAnimation());
-        	if (frames == null || frames.length == 0) {
-        		frames = player.getSpriteMap().get(player.getAnimation());
-        	}
-        	image = frames[0];
-        } else {
-            BufferedImage[] frames = player.getSpriteMap().get(player.getAnimation());
-            if (frames == null || frames.length == 0) {
-                frames = player.getSpriteMap().get(player.getAnimation()); // fallback
-            }
-            image = frames[(player.getSpriteNum() - 1) % frames.length];
-        }
-    	
-    	
-    	if (image != null) {
-    		
-    		g2.drawImage(image, player.getX(), player.getY() , GameConfigurator.TILE_SIZE , GameConfigurator.TILE_SIZE, null);
-        }
-    	animate();
-	}
+			int drawX = offsetX + player.getX();
+		    int drawY = offsetY + player.getY();
+			
+			//state time è sia per hit che per invincible
+	    	if (player.getState() == State.HIT) {
+	            int frameIndex = (int) ((System.currentTimeMillis() - player.getStateTime()) / (player.getHIT_DURATION() / 5));
+	            frameIndex = Math.min(frameIndex, 4); // evita IndexOutOfBounds
+	            BufferedImage[] hitFrames = player.getSpriteMap().get(player.getAnimation());
+	            image = hitFrames != null ? hitFrames[frameIndex] : null;
+	        } else if (player.getMovement() == MovementState.JUMP) {
+	        	Animation animation = (player.getDirection() == Direction.RIGHT) ? Animation.JUMPR : Animation.JUMPL;
+	        	BufferedImage[] jumpFrames = player.getSpriteMap().get(animation);
+	            image = (jumpFrames != null && jumpFrames.length > 0)
+	                    ? jumpFrames[0]
+	                    : player.getSpriteMap().get(player.getAnimation())[0];  // backup sicuro
+	        } else if (player.getMovement() == MovementState.IDLE) {
+	        	BufferedImage[] frames = player.getSpriteMap().get(Animation.IDLE);
+	        	if (frames == null || frames.length == 0) {
+	        		frames = player.getSpriteMap().get(Animation.IDLE);
+	        	}
+	        	image = frames[0];
+	        } else {
+	            BufferedImage[] frames = player.getSpriteMap().get(player.getAnimation());
+	            if (frames == null || frames.length == 0) {
+	                frames = player.getSpriteMap().get(player.getAnimation()); // fallback
+	            }
+	            image = frames[(player.getSpriteNum() - 1) % frames.length];
+	        }
+	    	
+	    	
+	    	if (image != null) {
+	    		
+	    		g2.drawImage(image, drawX, drawY, GameConfigurator.TILE_SIZE , GameConfigurator.TILE_SIZE, null);
+	        }
+	    	animate();
+		}
+	 
+	 public void update(Player player) {
+		 this.setPlayer(player);
+	 }
     
     private void animate() {
 		 int spriteCounter = player.getSpriteCounter() + 1;
@@ -102,12 +87,16 @@ public class PlayerView extends JComponent {
 			 player.setSpriteCounter(0);     // <- resetta il contatore
 		 }	    
 	 }
-    
-    @Override
-	protected void paintComponent(Graphics g) {
-	    super.paintComponent(g);
-	    draw(g);  
+
+	public Player getPlayer() {
+		return player;
 	}
+
+	public void setPlayer(Player player) {
+		this.player = player;
+	}
+    
+    
 
 	
 }

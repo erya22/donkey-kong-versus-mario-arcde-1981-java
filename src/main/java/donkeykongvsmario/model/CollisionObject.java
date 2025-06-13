@@ -5,8 +5,8 @@ import com.google.gson.annotations.SerializedName;
 public class CollisionObject {
     private int id;
     private String name;
-    private float x, y;
-    private float width, height;
+    private int x, y;
+    private int width, height;
 
     @SerializedName("visible")
     private boolean isVisible;
@@ -14,10 +14,10 @@ public class CollisionObject {
     // Getters
     public int getId() { return id; }
     public String getName() { return name; }
-    public float getX() { return x; }
-    public float getY() { return y; }
-    public float getWidth() { return width; }
-    public float getHeight() { return height; }
+    public int getX() { return x; }
+    public int getY() { return y; }
+    public int getWidth() { return width; }
+    public int getHeight() { return height; }
     public boolean isVisible() { return isVisible; }
 
     // Setters (opzionali, se non modifichi gli oggetti dopo il parsing)

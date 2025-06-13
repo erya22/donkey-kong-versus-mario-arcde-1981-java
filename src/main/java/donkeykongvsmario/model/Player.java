@@ -11,7 +11,6 @@ import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import donkeykongvsmario.obspattern.Observable;
 import donkeykongvsmario.obspattern.Observer;
 
 public class Player extends Entity {
@@ -35,6 +34,8 @@ public class Player extends Entity {
 	private  int highscore;
 	
 	private HashMap<Animation, BufferedImage[]> spriteMap;
+	
+	private BufferedImage currentSprite;
 	
 	public Player(Universe universe, String name) {
 		super(universe, name);
@@ -81,7 +82,6 @@ public class Player extends Entity {
 
 	public void getPlayerImage() {
         try {
-        	
             // UP/DOWN
             BufferedImage[] up = new BufferedImage[7];
             for (int i = 0; i < 7; i++) {
@@ -96,7 +96,7 @@ public class Player extends Entity {
                 right[i] = ImageIO.read(getClass().getResourceAsStream("/PLAYER/a" + (i + 1) + ".png"));
             }
             spriteMap.put(Animation.WALKR, right);
-
+            spriteMap.put(Animation.IDLE, right);
             // LEFT
             BufferedImage[] left = new BufferedImage[4];
             for (int i = 0; i < 4; i++) {
@@ -112,13 +112,18 @@ public class Player extends Entity {
             jumpL[0] = ImageIO.read(getClass().getResourceAsStream("/PLAYER/m3.png"));
             spriteMap.put(Animation.JUMPL, jumpL);
 
-            BufferedImage[] hitFrames = new BufferedImage[5];
+            BufferedImage[] hitFramesR = new BufferedImage[5];
             // DEATH ANIMATION
             for (int i = 0; i < 5; i++) {
-                hitFrames[i] = ImageIO.read(getClass().getResourceAsStream("/PLAYER/e" + (i + 1) + ".png"));
+                hitFramesR[i] = ImageIO.read(getClass().getResourceAsStream("/PLAYER/e" + (i + 1) + ".png"));
             }
             
-            spriteMap.put(Animation.HITR, hitFrames);
+            spriteMap.put(Animation.HITR, hitFramesR);
+            
+            BufferedImage[] hitFramesL = new BufferedImage[6];
+            for (int i = 5; i > 0; i--) {
+            	hitFramesL[i] = ImageIO.read(getClass().getResourceAsStream("/PLAYER/e" + i + ".png"));	
+            }
 
 
         } catch (IOException e) {
@@ -198,5 +203,41 @@ public class Player extends Entity {
 		
 	}
 	
+	public BufferedImage getCurrentSprite() {
+		return currentSprite;
+	}
+
+	public void setCurrentSprite(BufferedImage currentSprite) {
+		this.currentSprite = currentSprite;
+	}
+
+	public void move(int dx, int dy) {
+	    int newX = this.getX() + dx;
+	    int newY = this.getY() + dy;
+
+	    // usa l'universo per verificare la collisione
+	    if (!getUniverse().checkCollision(newX, newY, getWidth(), getHeight())) {
+	        // nessuna collisione, aggiorna posizione
+	        this.setX(newX);
+	        this.setY(newY);
+	    } else {
+	        // collisione, blocca movimento
+	        System.out.println("Collisione rilevata, movimento bloccato");
+	    }
+	}
+
+	public void idle() {
+		if (getTerrain() != Terrain.AIR) {
+			return;
+		}
+		switch(getMovement()) {
+			case JUMP: 
+				this.setMovement(MovementState.FALL);
+				this.setVelocityY(0);
+				break;
+			
+		}
+		
+	}
 
 }

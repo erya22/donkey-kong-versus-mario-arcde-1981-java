@@ -19,7 +19,8 @@ public class GameWindow extends JFrame {
 		
 		setLayout(new BorderLayout());
 		
-		UniversePanel uniPanel = new UniversePanel();
+		Universe universe = new Universe();
+		UniversePanel uniPanel = new UniversePanel(universe);
 		add(uniPanel, BorderLayout.CENTER);
 		
 		addKeyListener(new GameInputHandler());
