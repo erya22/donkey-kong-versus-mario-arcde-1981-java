@@ -124,6 +124,8 @@ public class Entity {
 		return x;
 	}
 
+	
+	
 	public void setX(int x) {
 		log.info("set x({})", x);
 		this.x = x;

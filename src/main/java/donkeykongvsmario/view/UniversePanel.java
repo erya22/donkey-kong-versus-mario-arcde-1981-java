@@ -192,8 +192,8 @@ public class UniversePanel extends JPanel {
 //		g2.translate(-offsetX, -offsetY);
 		
 		g2.setColor(Color.RED);
-	    g2.setStroke(new BasicStroke(5)); // Spessore del bordo
-	    g2.drawRect(offsetX, offsetY, mapWidth, mapHeight);
+		g2.setStroke(new BasicStroke(2));
+		g2.draw(GameConfigurator.MAP_BOUNDS);
 
 	}
 

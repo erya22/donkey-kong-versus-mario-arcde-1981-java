@@ -1,20 +1,34 @@
 package donkeykongvsmario.utils;
 
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.util.HashMap;
 import java.util.Map;
 
 public class GameConfigurator {
 	//SCREEN SETTINGS
-	public static int LARGHEZZA_SCHERMO = Toolkit.getDefaultToolkit().getScreenSize().width;
-	public static int ALTEZZA_SCHERMO = Toolkit.getDefaultToolkit().getScreenSize().height;
+	public static int SCREEN_WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width;
+	public static int SCREEN_HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
 	
 	//GLOBAL VARIABLES THAT HELP SET THE MAP
 	public static final int U_TILE_COLS = 28;
 	public static final int  U_TILE_ROWS = 32;
 	public static final int U_TILE_SIZE = 32;
-	public static int TILE_SIZE = ALTEZZA_SCHERMO / U_TILE_ROWS;
+	public static int TILE_SIZE = SCREEN_HEIGHT / U_TILE_ROWS;
 	
+	// Definizione della mappa
+    public static final int MAP_WIDTH = U_TILE_COLS * TILE_SIZE; // Numero di colonne * dimensione tile
+    public static final int MAP_HEIGHT = U_TILE_ROWS  * TILE_SIZE;
+	
+    public static final int MAP_OFFSET_X = (SCREEN_WIDTH - MAP_WIDTH) / 2;
+    public static final int MAP_OFFSET_Y = (SCREEN_HEIGHT - MAP_HEIGHT) / 2;
+
+    public static final Rectangle MAP_BOUNDS = new Rectangle(
+        MAP_OFFSET_X, 
+        MAP_OFFSET_Y, 
+        MAP_WIDTH, 
+        MAP_HEIGHT
+    );
 	//GLOBAL SETTING
 	public final int GRAVITY = 2;
 	
