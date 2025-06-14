@@ -1,5 +1,6 @@
 package donkeykongvsmario.view;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -11,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import donkeykongvsmario.model.ActionState;
-import donkeykongvsmario.model.AnimationType;
 import donkeykongvsmario.model.Direction;
 import donkeykongvsmario.model.Player;
 import donkeykongvsmario.utils.GameConfigurator;
@@ -108,8 +108,9 @@ public class PlayerView extends JComponent {
 	
 	 @Override
 		protected void paintComponent(Graphics g) {
-		    super.paintComponent(g);
+		    super.paintComponent(g);	
 		    draw(g, GameConfigurator.MAP_OFFSET_X, GameConfigurator.MAP_OFFSET_Y);  
+		    
 		}
     
     

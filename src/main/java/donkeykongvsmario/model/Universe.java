@@ -3,12 +3,16 @@ package donkeykongvsmario.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import donkeykongvsmario.utils.CollisionLoader;
-import donkeykongvsmario.utils.TileMapLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import donkeykongvsmario.utils.CollisionManager;
+import donkeykongvsmario.utils.GameConfigurator;
 
 public class Universe {
+	private static final Logger log = LoggerFactory.getLogger(Universe.class);
 	private Map map;
-	private List<CollisionObject> collisionObjects;
+	private List<Collision> collision;
 	
 	//OGGETTI
 	private List<GameItem> items = new ArrayList<GameItem>();
@@ -17,12 +21,12 @@ public class Universe {
 	private Player player;
 	
 	public Universe() {
-		collisionObjects = CollisionLoader.loadCollisionMap();
+		collision = CollisionManager.loadSampleCollisions();
 		this.player = new Player(this, "Mario");
 		this.map = new Map();
 		
-		if (collisionObjects != null) {
-            for (CollisionObject obj : collisionObjects) {
+		if (collision != null) {
+            for (Collision obj : collision) {
                 System.out.println("Caricata collisione: " + obj);
             }
         } else {
@@ -32,23 +36,45 @@ public class Universe {
 		
 	}
 	
-	public boolean checkCollision(int x, int y, int width, int height) {
-	    for (CollisionObject obj : collisionObjects) {
-	        int objX = obj.getX();
-	        int objY = obj.getY();
-	        int objWidth = obj.getWidth();
-	        int objHeight = obj.getHeight();
+	public boolean checkCollision() {
+	   for (Collision collision : this.getCollision()) {
+		   if (isMarioOnBeam(this.getPlayer(), collision) ) {
+			   getPlayer().setTerrain(Terrain.BEAM);
+			   return true;
+		   }
+	   }
+	   return false;
+		   
+//		   } else if (isMarioOnAir(this.getPlayer(), collision)) {
+//			   
+//		   } else if (isMarioOnLadder(this.getPlayer(), collision)) {
+//			   
+//		   }
+//		   
+//	   }
+	}
+	
+	
 
-	        boolean collisionX = x < objX + objWidth && x + width > objX;
-	        boolean collisionY = y < objY + objHeight && y + height > objY;
 
-	        if (collisionX && collisionY) {
-	            return true;  // collisione trovata
-	        }
-	    }
-	    return false; // nessuna collisione
+	
+	public List<Collision> getCollision() {
+		return collision;
 	}
 
+	public void setCollision(List<Collision> collision) {
+		this.collision = collision;
+	}
+
+	private boolean isMarioOnAir(Player mario, CollisionObject collision) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	private boolean isMarioOnLadder(Player mario, CollisionObject collision) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 
 	public Map getMap() {
 		return map;
@@ -74,7 +100,35 @@ public class Universe {
 		this.player = player;
 	}
 	
+	/***----GESTIONE COLLISIONI----***/
+//	public boolean isMarioOnBeam(Player mario, Collision collision) {
+//		log.info("x{} y{} collisionx{} collisiony{}", mario.getX(), mario.getY(), collision.getX(), collision.getY());
+//		boolean controllo = (mario.getY() + mario.getHeight() >= (collision.getY() - GameConfigurator.TILE_SIZE)) && 
+//		           (mario.getY() + mario.getHeight() <= (collision.getY() + collision.getHeight() - GameConfigurator.TILE_SIZE)) &&
+//		           (mario.getX() + (mario.getWidth()/2) > collision.getX()) &&
+//		           (mario.getX() + mario.getWidth()/2 < collision.getX() + collision.getWidth());
+//		log.info("controllo {}", controllo);
+//		return controllo;
+// 
+//	}
 	
+	public boolean isMarioOnBeam(Player mario, Collision collision) {
+	    int marioBottom = mario.getY() + mario.getHeight();
+	    int beamTop = collision.getY();
+	    int beamBottom = collision.getY() + collision.getHeight();
+	    
+	    // Mario tocca la parte superiore della trave
+	    boolean verticalOverlap = marioBottom >= beamTop && marioBottom <= beamTop + 5; // margine tolleranza
+	    int marioCenterX = mario.getX() + mario.getWidth() / 2;
+	    boolean horizontalInside = marioCenterX >= collision.getX() && marioCenterX <= collision.getX() + collision.getWidth();
+
+	    boolean controllo = verticalOverlap && horizontalInside;
+	    log.info("marioBottom={} beamTop={} beamBottom={} marioCenterX={} beamX={} beamW={} controllo={}",
+	        marioBottom, beamTop, beamBottom, marioCenterX, collision.getX(), collision.getWidth(), controllo);
+	    
+	    return controllo;
+	}
+
 	
 	
 	

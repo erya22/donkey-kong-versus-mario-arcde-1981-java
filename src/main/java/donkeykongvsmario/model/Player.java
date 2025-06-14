@@ -75,7 +75,8 @@ public class Player extends Entity {
 		this.setCurrentFrameIndex(0);
 		
 		this.setFrameIndex((int) ((System.currentTimeMillis() - this.getHIT_DURATION()) / (this.getHIT_DURATION() / 5)));
-		
+		setWidth(GameConfigurator.TILE_SIZE);
+		setHeight(GameConfigurator.TILE_SIZE);
 		
 	}
 	
@@ -229,19 +230,25 @@ public class Player extends Entity {
 	            BufferedImage[] rightAnim = getAnimations(ActionState.WALKING, Direction.RIGHT);
 	            if (rightAnim != null) {
 	                setCurrentSpriteMap(rightAnim);
-	                this.setX(getX() + this.getVelocityX());
 	            } else {
 	                log.error("Right walking animation is null!");
 	            }
+	            if (getUniverse().checkCollision()) {
+	            	this.setX(getX() + this.getVelocityX());
+	            }
+	            
 	            break;
 	        case LEFT:
 	            setDirection(Direction.LEFT);
 	            BufferedImage[] leftAnim = getAnimations(ActionState.WALKING, Direction.LEFT);
 	            if (leftAnim != null) {
 	                setCurrentSpriteMap(leftAnim);
-	                this.setX(getX() - this.getVelocityX());
 	            } else {
 	                log.error("Left walking animation is null!");
+	            }
+	            if (getUniverse().checkCollision()) {
+	            	this.setX(getX() - this.getVelocityX());
+	            	log.info("BEAM TROVATA");
 	            }
 	            break;
 	        default:
@@ -271,21 +278,7 @@ public class Player extends Entity {
 	public void setAnimationType(AnimationType animationType) {
 		this.animationType = animationType;
 	}
-	
-//	public void move(int dx, int dy) {
-//	    int newX = this.getX() + dx;
-//	    int newY = this.getY() + dy;
-//
-//	    // usa l'universo per verificare la collisione
-//	    if (!getUniverse().checkCollision(newX, newY, getWidth(), getHeight())) {
-//	        // nessuna collisione, aggiorna posizione
-//	        this.setX(newX);
-//	        this.setY(newY);
-//	    } else {
-//	        // collisione, blocca movimento
-//	        System.out.println("Collisione rilevata, movimento bloccato");
-//	    }
-//	}
+
 
 //	public void idle() {
 //		if (getTerrain() != Terrain.AIR) {
@@ -300,6 +293,8 @@ public class Player extends Entity {
 //		}
 //		
 //	}
+	
+	
 	
 	
 
