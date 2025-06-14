@@ -60,8 +60,8 @@ public class Player extends Entity {
 	
 	public void setDefaultValues()  {
 		
-		this.setX((GameConfigurator.SCREEN_WIDTH - GameConfigurator.MAP_WIDTH) / 2);
-		this.setY(30 * GameConfigurator.TILE_SIZE);
+		this.setX(0);
+		this.setY(30* GameConfigurator.TILE_SIZE);
 		
 		this.setVelocityY(4);
 		this.setVelocityX(4);

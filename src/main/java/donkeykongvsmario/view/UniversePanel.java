@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.JPanel;
@@ -17,10 +18,12 @@ import org.slf4j.LoggerFactory;
 
 import donkeykongvsmario.model.ActionState;
 import donkeykongvsmario.model.AnimationType;
+import donkeykongvsmario.model.Collision;
 import donkeykongvsmario.model.Direction;
 import donkeykongvsmario.model.Map;
 import donkeykongvsmario.model.Player;
 import donkeykongvsmario.model.Universe;
+import donkeykongvsmario.utils.CollisionManager;
 import donkeykongvsmario.utils.GameConfigurator;
 
 public class UniversePanel extends JPanel {
@@ -34,6 +37,9 @@ public class UniversePanel extends JPanel {
 	
 	
 	private Universe universe;
+	
+	private List<Collision> collisions;
+	private CollisionRenderer collisionRenderer;
 	/**
 	 * Si occupa di gestire le view di tutte le entità di gioco.
 	 */
@@ -54,6 +60,10 @@ public class UniversePanel extends JPanel {
 		
 		this.map = new Map();
 		this.mapPanel = new MapRenderer(map);
+		
+		this.collisions = CollisionManager.loadSampleCollisions();
+		this.collisionRenderer = new CollisionRenderer(collisions);
+		
 		
 		setBackground(Color.BLACK);
 		
@@ -182,13 +192,14 @@ public class UniversePanel extends JPanel {
 		// Calcola l’offset per centrare la mappa
 		int mapWidth = GameConfigurator.U_TILE_COLS * GameConfigurator.TILE_SIZE;
 		int mapHeight = GameConfigurator.U_TILE_ROWS * GameConfigurator.TILE_SIZE;
-		int offsetX = (getWidth() - mapWidth) / 2;
-		int offsetY = (getHeight() - mapHeight) / 2;
+		int offsetX = GameConfigurator.MAP_OFFSET_X;
+		int offsetY = GameConfigurator.MAP_OFFSET_Y;
 		
 		mapPanel.render(g2, offsetX, offsetY);
-//		g2.translate(offsetX, offsetY);
-		playerView.draw(g2);
-//		g2.translate(-offsetX, -offsetY);
+		playerView.draw(g2, offsetX, offsetY); // passa offset
+		collisionRenderer.draw(g2, offsetX, offsetY);
+
+		
 		
 		g2.setColor(Color.RED);
 		g2.setStroke(new BasicStroke(2));

@@ -25,12 +25,12 @@ public class PlayerView extends JComponent {
 		this.player = player;
 	}
 	
-	 public void draw(Graphics g) {
+	 public void draw(Graphics g, int offsetX, int offsetY) {
 			Graphics2D g2 = (Graphics2D) g;
 			BufferedImage image = null;
 
-			int drawX = player.getX();
-		    int drawY = player.getY();
+			int drawX = player.getX() + offsetX;
+		    int drawY = player.getY() + offsetY;
 		    
 		    
 		    
@@ -109,7 +109,7 @@ public class PlayerView extends JComponent {
 	 @Override
 		protected void paintComponent(Graphics g) {
 		    super.paintComponent(g);
-		    draw(g);  
+		    draw(g, GameConfigurator.MAP_OFFSET_X, GameConfigurator.MAP_OFFSET_Y);  
 		}
     
     
