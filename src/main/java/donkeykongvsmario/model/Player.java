@@ -40,6 +40,9 @@ public class Player extends Entity {
 	private HashMap<SimpleEntry<ActionState, Direction>, BufferedImage[]> animations;
 	private AnimationType animationType;
 	
+	private Collision currentBeam;
+	private Collision nextBeam;
+	
 	public Player(Universe universe, String name) {
 		super(universe, name);
 
@@ -78,10 +81,18 @@ public class Player extends Entity {
 		setWidth(GameConfigurator.TILE_SIZE);
 		setHeight(GameConfigurator.TILE_SIZE);
 		
+		setCurrentBeam(getUniverse().getCollision().get(0));
+		
 	}
 	
-	
-	
+	public Collision getCurrentBeam() {
+		return currentBeam;
+	}
+
+	public void setCurrentBeam(Collision currentBeam) {
+		this.currentBeam = currentBeam;
+	}
+
 	public int getCurrentFrameIndex() {
 		return currentFrameIndex;
 	}
@@ -91,8 +102,7 @@ public class Player extends Entity {
 	}
 
 	public void getPlayerImage() {
-		 this.animations = new HashMap<>();
-
+		this.animations = new HashMap<>();
 		
         try {
             // UP/DOWN
@@ -233,8 +243,21 @@ public class Player extends Entity {
 	            } else {
 	                log.error("Right walking animation is null!");
 	            }
+	            
 	            if (getUniverse().checkCollision()) {
-	            	this.setX(getX() + this.getVelocityX());
+	                Collision currentBeam = getUniverse().getBeamUnderMario();
+	                Collision next = getNextBeam();
+	                setNextBeam(next);
+	                setCurrentBeam(currentBeam);
+	                
+	                if (next != null && getUniverse().canMarioStepUp(next)) {
+	                    setY(getCurrentBeam().getY() - getHeight());
+	                    setCurrentBeam(next);
+	                    log.info("Mario è salito sulla nuova beam: {}", next);
+	                } else {
+	                    setX(getX() + getVelocityX()); // movimento orizzontale normale
+	                }
+
 	            }
 	            
 	            break;
@@ -278,21 +301,68 @@ public class Player extends Entity {
 	public void setAnimationType(AnimationType animationType) {
 		this.animationType = animationType;
 	}
-
-
-//	public void idle() {
-//		if (getTerrain() != Terrain.AIR) {
-//			return;
-//		}
-//		switch(getMovement()) {
-//			case JUMP: 
-//				this.setMovement(MovementState.FALL);
-//				this.setVelocityY(0);
-//				break;
-//			
-//		}
-//		
+	
+//	public Collision getNextBeamFromCurrent(Collision current, Direction direction) {
+//	    int stepY = 100; // distanza verticale tra una beam e l'altra (dipende dalla tua mappa)
+//	    int nextY = current.getY() - stepY;
+//
+//	    int nextX;
+//	    if (direction == Direction.RIGHT) {
+//	        nextX = current.getX() + current.getWidth(); // salta in avanti
+//	    } else {
+//	        nextX = current.getX() - current.getWidth(); // salta indietro
+//	    }
+//
+//	    // Previeni uscite dalla mappa
+//	    if (nextX < 0 || nextY < 0 || nextX > GameConfigurator.MAP_WIDTH) {
+//	        log.warn("Prossima beam fuori mappa. Mario resta sulla stessa beam.");
+//	        return current;
+//	    }
+//
+//	    for (Collision beam : getUniverse().getCollision()) {
+//	        if (beam.getY() == nextY &&
+//	            beam.getX() < nextX && 
+//	            beam.getX() + beam.getWidth() > nextX) {
+//	            return beam;
+//	        }
+//	    }
+//
+//	    log.warn("Nessuna beam trovata in (x={}, y={})", nextX, nextY);
+//	    return current; // fallback: resta dove sei
 //	}
+
+	public Collision getNextBeam() {
+	    Collision current = getCurrentBeam();
+	    int playerX = getX();
+	    int direction = getDirection() == Direction.RIGHT ? 1 : -1;
+
+	    for (Collision beam : getUniverse().getCollision()) {
+	        if (beam == current) continue;
+
+	        boolean isInRangeX = (direction > 0)
+	            ? beam.getX() > current.getX() // beam a destra
+	            : beam.getX() + beam.getWidth() < current.getX(); // beam a sinistra
+
+	        boolean isOverlappingX = (playerX + getWidth() >= beam.getX() &&
+	                                  playerX <= beam.getX() + beam.getWidth());
+
+	        int heightDifference = current.getY() - beam.getY();
+
+	        if (isInRangeX && isOverlappingX &&
+	            heightDifference > 0 &&
+	            heightDifference <= GameConfigurator.MAX_STEP_HEIGHT) {
+	            return beam;
+	        }
+	    }
+
+	    return null;
+	}
+
+
+	public void setNextBeam(Collision nextBeam) {
+		this.nextBeam = nextBeam;
+	}
+
 	
 	
 	

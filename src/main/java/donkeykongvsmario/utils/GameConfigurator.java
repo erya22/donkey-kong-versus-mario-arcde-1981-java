@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class GameConfigurator {
+	
 	//SCREEN SETTINGS
 	public static int SCREEN_WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width;
 	public static int SCREEN_HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
@@ -32,8 +33,10 @@ public class GameConfigurator {
 	//GLOBAL SETTING
 	public final int GRAVITY = 2;
 	
-	private static final Map<Integer, Integer> BEAM_HEIGHTS = new HashMap<>();
-    private static final Map<Integer, Integer> LADDER_HEIGHTS = new HashMap<>();
+	public static final Map<Integer, Integer> BEAM_HEIGHTS = new HashMap<>();
+    public static final Map<Integer, Integer> LADDER_HEIGHTS = new HashMap<>();
+    
+    public static final int MAX_STEP_HEIGHT = GameConfigurator.TILE_SIZE / 3;
 
     static {
         BEAM_HEIGHTS.put(30, 2);  

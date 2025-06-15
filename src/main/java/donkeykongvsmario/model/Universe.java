@@ -101,16 +101,6 @@ public class Universe {
 	}
 	
 	/***----GESTIONE COLLISIONI----***/
-//	public boolean isMarioOnBeam(Player mario, Collision collision) {
-//		log.info("x{} y{} collisionx{} collisiony{}", mario.getX(), mario.getY(), collision.getX(), collision.getY());
-//		boolean controllo = (mario.getY() + mario.getHeight() >= (collision.getY() - GameConfigurator.TILE_SIZE)) && 
-//		           (mario.getY() + mario.getHeight() <= (collision.getY() + collision.getHeight() - GameConfigurator.TILE_SIZE)) &&
-//		           (mario.getX() + (mario.getWidth()/2) > collision.getX()) &&
-//		           (mario.getX() + mario.getWidth()/2 < collision.getX() + collision.getWidth());
-//		log.info("controllo {}", controllo);
-//		return controllo;
-// 
-//	}
 	
 	public boolean isMarioOnBeam(Player mario, Collision collision) {
 	    int marioBottom = mario.getY() + mario.getHeight();
@@ -128,8 +118,116 @@ public class Universe {
 	    
 	    return controllo;
 	}
+	
+	public Collision getBeamAboveMario(Player mario, List<Collision> beams) {
+	    int marioHeadY = mario.getY(); // Top of Mario
+
+	    for (Collision beam : beams) {
+	        // Verifica che la beam sia sopra la testa di Mario, ma non troppo in alto
+	        if (beam.getY() + beam.getHeight() <= marioHeadY &&
+	            marioHeadY - (beam.getY() + beam.getHeight()) <= GameConfigurator.TILE_SIZE &&
+	            mario.getX() + mario.getWidth() > beam.getX() &&
+	            mario.getX() < beam.getX() + beam.getWidth()) {
+	            return beam;
+	        }
+	    }
+	    return null;
+	}
 
 	
+//	public boolean canMarioStepUp(Collision next) {
+//	    for (Collision nextBeam : getCollision()) {
+//	    	log.info("Beam = {} \n", nextBeam.toString());
+//	        //se è la beam corrente, essa viene saltata
+//	    	if (nextBeam == getPlayer().getCurrentBeam()) continue;
+//
+//	        // Controlla se la nuova trave è adiacente (destra o sinistra) 
+//	        boolean isAdjacentRight = (player.getX() + player.getWidth() >= nextBeam.getX() &&
+//	                                   player.getX() + player.getWidth() <= nextBeam.getX() + 10);
+//	        
+//	        boolean isAdjacentLeft = (player.getX() <= nextBeam.getX() + nextBeam.getWidth() &&
+//	                                  player.getX() >= nextBeam.getX() + nextBeam.getWidth() - 10);
+//
+//	        // Altezza della trave rispetto a quella su cui si trova
+//	        int heightDifference = getPlayer().getCurrentBeam().getY() - nextBeam.getY();
+//
+//	        log.info("height difference {}", heightDifference);
+//	        
+//	        // Verifica se è salibile (es. altezza > 0 ma < soglia)
+//	        if ((isAdjacentRight || isAdjacentLeft) &&
+//	            heightDifference > 0 && heightDifference <= GameConfigurator.MAX_STEP_HEIGHT) {
+//	            return true;
+//	        }
+//	    }
+//
+//	    return false;
+//	}
+	
+	public boolean canMarioStepUp(Collision next) {
+	    for (Collision beam : getCollision()) {
+	        if (beam == getPlayer().getCurrentBeam()) continue;
+
+	        boolean isAdjacentRight = (player.getX() + player.getWidth() >= beam.getX() &&
+	                                   player.getX() + player.getWidth() <= beam.getX() + 10);
+	        
+	        boolean isAdjacentLeft = (player.getX() <= beam.getX() + beam.getWidth() &&
+	                                  player.getX() >= beam.getX() + beam.getWidth() - 10);
+
+	        int heightDifference = getPlayer().getCurrentBeam().getY() - beam.getY();
+
+	        log.info("Testing beam: {} | AdjR: {} | AdjL: {} | HeightDiff: {}",
+	                 beam.toString(), isAdjacentRight, isAdjacentLeft, heightDifference);
+
+	        if ((isAdjacentRight || isAdjacentLeft) &&
+	            heightDifference > 0 && heightDifference <= GameConfigurator.MAX_STEP_HEIGHT) {
+	            log.info("Mario può salire sulla beam: {}", beam.toString());
+	            return true;
+	        }
+	    }
+
+	    log.info("Mario NON può salire su nessuna beam vicina");
+	    return false;
+	}
+
+
+
+	public Collision getBeamUnderMario() {
+	    for (Collision c : collision) {
+	        if (isMarioOnBeam(player, c)) {
+	            return c;
+	        }
+	    }
+	    return null;
+	}
+
+	public Collision getNextBeam(Player mario, List<Collision> beams) {
+	    Collision currentBeam = getBeamUnderMario();
+	    if (currentBeam == null) return null;
+
+	    for (Collision beam : beams) {
+	        if (beam == currentBeam) continue;
+
+	        int marioCenterX = mario.getX() + mario.getWidth() / 2;
+
+	        // Check if this beam is horizontally adjacent to Mario (on either side)
+	        boolean isRight = beam.getX() <= marioCenterX + GameConfigurator.TILE_SIZE &&
+	                          beam.getX() > marioCenterX;
+
+	        boolean isLeft = beam.getX() + beam.getWidth() >= marioCenterX - GameConfigurator.TILE_SIZE &&
+	                         beam.getX() + beam.getWidth() < marioCenterX;
+
+	        // Check that the beam is within climbable vertical range
+	        int heightDifference = currentBeam.getY() - beam.getY(); // Positive if beam is above
+	        boolean isStepHeightOK = heightDifference > 0 && heightDifference <= GameConfigurator.TILE_SIZE / 2;
+
+	        if ((isRight || isLeft) && isStepHeightOK) {
+	            return beam;
+	        }
+	    }
+
+	    return null;
+	}
+
 	
 	
 	

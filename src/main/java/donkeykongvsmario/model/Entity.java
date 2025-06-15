@@ -7,6 +7,8 @@ import java.util.HashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import donkeykongvsmario.utils.GameConfigurator;
+
 public class Entity {
 	private static final Logger log = LoggerFactory.getLogger(Entity.class);
 	
@@ -128,7 +130,7 @@ public class Entity {
 	
 	public void setX(int x) {
 		log.info("set x({})", x);
-		this.x = x;
+		if (x >= 0 && x <= GameConfigurator.MAP_WIDTH) this.x = x;
 	}
 
 	public int getY() {
@@ -136,8 +138,8 @@ public class Entity {
 	}
 
 	public void setY(int y) {
-		log.info("set x({})", x);
-		this.y = y;
+		log.info("set y({})", x);
+		if (y >= 0 && y <= GameConfigurator.MAP_HEIGHT) this.y = y;
 	}
 
 	public int getVelocityX() {
